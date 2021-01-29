@@ -2,23 +2,43 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import ReactGoogleMaps from './ReactGoogleMaps';
 import Video from './Video';
-import { Row, Col } from 'react-bootstrap';
+import InfiniteScroll from "react-infinite-scroll-component";
 import './App.css';
 
-const API_KEY = 'AIzaSyBhood8bE-nqAUFL1ashXgv42H6TXHjJOE';
-
 function App() {
-  const [videos, setVideos] = useState([]);
+  const initialCoord = { lat: 38.9637, lng: 35.2433 }; // Turkey
 
-  function getInitialVideos() {
-    axios.get(`https://youtube.googleapis.com/youtube/v3/search?part=snippet&location=38.9637%2C35.2433&maxResults=10&order=date&locationRadius=100mi&q=surfing&type=video&key=${API_KEY}`).then(result => {
-      console.log(result.data.items);
-      setVideos(result?.data?.items || []);
+  const [videos, setVideos] = useState([]);
+  const [nextPageToken, setNextPageToken] = useState(null);
+  const [coord, setCoord] = useState(initialCoord);
+
+  function fetchData (newCoord, resetPageToken) {
+    let pageToken = '';
+
+    if (resetPageToken) {
+      setNextPageToken(null);
+      setVideos([]);
+    } else {
+      pageToken = nextPageToken ? '&pageToken=' + nextPageToken : '';
+      console.log('pageToken', pageToken);
+    }
+  
+    axios.get(`https://youtube.googleapis.com/youtube/v3/search?part=snippet&location=${newCoord.lat}%2C${newCoord.lng}&maxResults=10&order=date&locationRadius=100mi&type=video&key=${process.env.REACT_APP_GOOGLE_API_KEY}${pageToken}`).then(result => {
+      console.log(result?.data?.nextPageToken);
+
+      if (resetPageToken) {
+        setVideos(result?.data?.items);
+      } else {
+        const moreVideos = videos.concat(result?.data?.items || [])
+        setVideos(moreVideos);
+      }
+
+      setNextPageToken(result?.data?.nextPageToken);
     });
-  }
+  };
 
   useEffect(() => {
-    getInitialVideos();
+    fetchData(coord, false);
   }, []);
 
   console.log('videos', videos);
@@ -30,13 +50,20 @@ function App() {
         loadingElement={<div style={{ height: `100%` }} />}
         containerElement={<div style={{ height: `400px` }} />}
         mapElement={<div style={{ height: `100%` }} />}
-        setVideos={setVideos}
+        fetchData={fetchData}
+        coord={coord}
+        setCoord={setCoord}
       />
-      <Row>
+      <InfiniteScroll
+        dataLength={videos.length}
+        next={() => fetchData(coord, false)}
+        hasMore={true}
+        loader={<h4>Loading...</h4>}
+      >
         {videos.map((item) => (
-          <Col md="4"><Video videoId={item.id.videoId} /></Col>
+          <Video videoId={item.id.videoId} />
         ))}
-      </Row>
+      </InfiniteScroll>
     </div>
   );
 }

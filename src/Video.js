@@ -1,7 +1,7 @@
 import React from 'react';
 import YouTube from 'react-youtube';
 
-function Video() {
+function Video(props) {
   const opts = {
     height: '100%',
     width: 'auto',
@@ -16,7 +16,7 @@ function Video() {
     event.target.pauseVideo();
   }
 
-  return <YouTube videoId="2g811Eo7K8U" opts={opts} onReady={onReady} />;
+  return <YouTube videoId={props.videoId} opts={opts} onReady={onReady} />;
 }
 
 export default Video;
