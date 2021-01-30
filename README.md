@@ -9,6 +9,13 @@ This project was created with [Create React App](https://github.com/facebook/cre
 
 ## Quick Start
 
+### `Get Google API_KEY`
+
+In order to use YouTube Data API and Maps Javascript API you should enable them and generate an API key.
+For more information: https://console.cloud.google.com/
+
+Once you have the API key, place it in `.env` file where you see `[YOUR_API_KEY]` and remove `#` sign in the row.
+
 ### `npm install`
 
 Install dependencies.
