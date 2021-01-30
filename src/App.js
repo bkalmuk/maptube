@@ -1,8 +1,9 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import ReactGoogleMaps from './ReactGoogleMaps';
-import Video from './Video';
 import InfiniteScroll from "react-infinite-scroll-component";
+import Video from './Video';
+import { Col, Row } from 'react-bootstrap';
 import './App.css';
 
 function App() {
@@ -45,25 +46,27 @@ function App() {
 
   return (
     <div className="App">
-      <ReactGoogleMaps
-        googleMapURL="https://maps.googleapis.com/maps/api/js?key=AIzaSyC4R6AN7SmujjPUIGKdyao2Kqitzr1kiRg&v=3.exp&libraries=geometry,drawing,places"
-        loadingElement={<div style={{ height: `100%` }} />}
-        containerElement={<div style={{ height: `400px` }} />}
-        mapElement={<div style={{ height: `100%` }} />}
-        fetchData={fetchData}
-        coord={coord}
-        setCoord={setCoord}
-      />
-      <InfiniteScroll
-        dataLength={videos.length}
-        next={() => fetchData(coord, false)}
-        hasMore={true}
-        loader={<h4>Loading...</h4>}
-      >
-        {videos.map((item) => (
-          <Video videoId={item.id.videoId} />
-        ))}
-      </InfiniteScroll>
+      <Row>
+        <Col md={6}>
+          <ReactGoogleMaps
+            fetchData={fetchData}
+            coord={coord}
+            setCoord={setCoord}
+          />
+        </Col>
+        <Col md={6} className="p-0 pl-3">
+          <InfiniteScroll
+            dataLength={videos.length}
+            next={() => fetchData(coord, false)}
+            hasMore={true}
+            loader={<h4>Loading...</h4>}
+          >
+            {videos.map((item) => (
+              <Video videoId={item.id.videoId} />
+            ))}
+          </InfiniteScroll>
+        </Col>
+      </Row>
     </div>
   );
 }
